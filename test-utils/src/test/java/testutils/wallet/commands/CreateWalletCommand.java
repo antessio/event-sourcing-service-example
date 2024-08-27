@@ -1,4 +1,4 @@
-package antessio.eventsourcing.inmemory.wallet.commands;
+package testutils.wallet.commands;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -6,21 +6,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import antessio.eventsourcing.Command;
-import antessio.eventsourcing.inmemory.wallet.Wallet;
-import antessio.eventsourcing.inmemory.wallet.events.WalletCreatedEvent;
+
+import eventsourcing.Command;
 import eventsourcing.Event;
+import testutils.wallet.Wallet;
+import testutils.wallet.events.WalletCreatedEvent;
 
 
-public record CreateWalletCommand(UUID ownerId) implements Command<Wallet, UUID> {
+public record CreateWalletCommand(UUID ownerId) implements Command<Wallet> {
 
     @Override
-    public Optional<UUID> getAggregateId() {
+    public Optional<String> getAggregateId() {
         return Optional.empty();
     }
 
     @Override
-    public List<Event<Wallet, UUID>> process() {
+    public List<Event<Wallet>> process() {
         return List.of(new WalletCreatedEvent(
                 UUID.randomUUID(),
                 UUID.randomUUID(),

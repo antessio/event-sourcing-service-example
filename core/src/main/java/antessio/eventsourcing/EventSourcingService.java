@@ -3,6 +3,7 @@ package antessio.eventsourcing;
 import java.util.List;
 import java.util.Optional;
 
+import eventsourcing.Command;
 import eventsourcing.Event;
 import eventsourcing.EventStore;
 import eventsourcing.Projector;
@@ -11,17 +12,16 @@ import eventsourcing.aggregate.Aggregate;
 import eventsourcing.aggregate.AggregateStore;
 
 /**
- * This allows the source to publish a {@link Command} that triggers an {@link Event} that eventually
+ * This allows the source to publish a {@link eventsourcing.Command} that triggers an {@link Event} that eventually
  * is projected, through a {@link Projector}, on a {@link Aggregate}
  * @param <A>
- * @param <ID>
  */
-public class EventSourcingService<A extends Aggregate<ID>, ID> {
+public class EventSourcingService<A extends Aggregate> {
 
-    private final ReadStoreService<A, ID> readStoreService;
-    private final ProjectorStore<A, ID> projectorStore;
-    private final AggregateStore<A, ID> aggregateStore;
-    private final EventStore<A, ID> eventStore;
+    private final ReadStoreService<A> readStoreService;
+    private final ProjectorStore<A> projectorStore;
+    private final AggregateStore<A> aggregateStore;
+    private final EventStore<A> eventStore;
 
     /**
      *
@@ -29,7 +29,7 @@ public class EventSourcingService<A extends Aggregate<ID>, ID> {
      * @param aggregateStore Where the {@link Aggregate}s are stored.
      * @param eventStore Where the {@link Event}s are stored.
      */
-    public EventSourcingService(ProjectorStore<A, ID> projectorStore, AggregateStore<A, ID> aggregateStore, EventStore<A, ID> eventStore) {
+    public EventSourcingService(ProjectorStore<A> projectorStore, AggregateStore<A> aggregateStore, EventStore<A> eventStore) {
         this.readStoreService = new ReadStoreService<>(projectorStore, aggregateStore, eventStore);
         this.projectorStore = projectorStore;
         this.aggregateStore = aggregateStore;
@@ -41,8 +41,8 @@ public class EventSourcingService<A extends Aggregate<ID>, ID> {
      * @param command
      * @return
      */
-    public A publish(Command<A, ID> command, ReadStoreService<A, ID> readStoreService) {
-        List<Event<A, ID>> eventsToApply = command.process();
+    public A publish(Command<A> command, ReadStoreService<A> readStoreService) {
+        List<Event<A>> eventsToApply = command.process();
 
         eventStore.put(eventsToApply);
         // expected one command to update one aggregate
@@ -51,7 +51,7 @@ public class EventSourcingService<A extends Aggregate<ID>, ID> {
                 .getFirst();
     }
 
-    public A publish(Command<A, ID> command) {
+    public A publish(Command<A> command) {
         return publish(command, getReadStoreService());
     }
 
@@ -61,8 +61,8 @@ public class EventSourcingService<A extends Aggregate<ID>, ID> {
      * @param projector
      * @param <E>
      */
-    public  <E extends Event<A, ID>> void registerProjector(Projector<A, E, ID> projector) {
-        getProjectorStore().addProjector((Projector<A, Event<A, ID>, ID>) projector);
+    public  <E extends Event<A>> void registerProjector(Projector<A, E> projector) {
+        getProjectorStore().addProjector((Projector<A, Event<A>>) projector);
     }
 
     /**
@@ -70,20 +70,20 @@ public class EventSourcingService<A extends Aggregate<ID>, ID> {
      * @param id
      * @return
      */
-    public Optional<A> getAggregate(ID id) {
-        return getAggregateStore().get(id);
+    public Optional<A> getAggregate(String id, Class<A> cls) {
+        return getAggregateStore().get(id, cls);
     }
 
 
-    public ReadStoreService<A, ID> getReadStoreService() {
+    public ReadStoreService<A> getReadStoreService() {
         return readStoreService;
     }
 
-    public ProjectorStore<A, ID> getProjectorStore() {
+    public ProjectorStore<A> getProjectorStore() {
         return projectorStore;
     }
 
-    public AggregateStore<A, ID> getAggregateStore() {
+    public AggregateStore<A> getAggregateStore() {
         return aggregateStore;
     }
 

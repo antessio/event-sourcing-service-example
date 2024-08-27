@@ -1,14 +1,14 @@
-package antessio.eventsourcing.inmemory.wallet.events;
+package testutils.wallet.events;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-import antessio.eventsourcing.inmemory.wallet.Wallet;
 import eventsourcing.Event;
+import testutils.wallet.Wallet;
 
 
-public record WalletTopUpExecuted(UUID eventId, UUID walletId, BigDecimal amount, Instant occurredAt) implements Event<Wallet, UUID> {
+public record WalletTopUpExecuted(UUID eventId, UUID walletId, BigDecimal amount, Instant occurredAt) implements Event<Wallet> {
 
 
     @Override
@@ -22,8 +22,8 @@ public record WalletTopUpExecuted(UUID eventId, UUID walletId, BigDecimal amount
     }
 
     @Override
-    public UUID getAggregateId() {
-        return walletId;
+    public String getAggregateId() {
+        return walletId.toString();
     }
 
     @Override

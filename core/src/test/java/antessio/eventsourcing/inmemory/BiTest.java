@@ -13,20 +13,20 @@ import org.junit.jupiter.api.Test;
 
 
 import antessio.eventsourcing.ReadStoreService;
-import antessio.eventsourcing.inmemory.wallet.Wallet;
-import antessio.eventsourcing.inmemory.wallet.events.WalletCreatedEvent;
-import antessio.eventsourcing.inmemory.wallet.events.WalletTopUpExecuted;
-import antessio.eventsourcing.inmemory.wallet.projector.WalletProjections;
 import eventsourcing.Event;
 import eventsourcing.EventStore;
 import eventsourcing.ProjectorStore;
 import eventsourcing.aggregate.AggregateStore;
+import testutils.wallet.Wallet;
+import testutils.wallet.events.WalletCreatedEvent;
+import testutils.wallet.events.WalletTopUpExecuted;
+import testutils.wallet.projector.WalletProjections;
 
 public class BiTest {
-    private ProjectorStore<Wallet, UUID> projectorStore;
-    private AggregateStore<Wallet, UUID> aggregateStore;
-    private EventStore<Wallet, UUID> eventStore;
-    private ReadStoreService<Wallet, UUID> readStore;
+    private ProjectorStore<Wallet> projectorStore;
+    private AggregateStore<Wallet> aggregateStore;
+    private EventStore<Wallet> eventStore;
+    private ReadStoreService<Wallet> readStore;
 
     @BeforeEach
     void setUp() {
@@ -35,7 +35,7 @@ public class BiTest {
         eventStore = new InMemoryEventStore();
 
         readStore = new ReadStoreService<>(projectorStore, aggregateStore, eventStore);
-        WalletProjections.registerProjections(readStore);
+        WalletProjections.getProjectors().forEach(readStore::registerProjector);
     }
 
     @Test
@@ -44,13 +44,13 @@ public class BiTest {
         UUID newWalletId = UUID.randomUUID();
         UUID newWalletOwnerId = UUID.randomUUID();
         Wallet wallet = new Wallet(UUID.randomUUID(), BigDecimal.TEN, UUID.randomUUID());
-        List<Event<Wallet, UUID>> unprocessedEvents = List.of(
+        List<Event<Wallet>> unprocessedEvents = List.of(
                 new WalletCreatedEvent(UUID.randomUUID(), newWalletId, newWalletOwnerId, new BigDecimal(300), now.minus(10, ChronoUnit.MINUTES)),
-                new WalletTopUpExecuted(UUID.randomUUID(), wallet.getId(), new BigDecimal(10),now.minus(9, ChronoUnit.MINUTES)),
+                new WalletTopUpExecuted(UUID.randomUUID(), wallet.id(), new BigDecimal(10), now.minus(9, ChronoUnit.MINUTES)),
                 new WalletTopUpExecuted(UUID.randomUUID(), newWalletId, new BigDecimal(310), now.minus(8, ChronoUnit.MINUTES)));
-        List<Event<Wallet, UUID>> processedEvents = List.of(new WalletCreatedEvent(
+        List<Event<Wallet>> processedEvents = List.of(new WalletCreatedEvent(
                 UUID.randomUUID(),
-                wallet.getId(),
+                wallet.id(),
                 wallet.ownerId(),
                 wallet.amount(),
                 now.minus(15, ChronoUnit.MINUTES)));
@@ -62,10 +62,10 @@ public class BiTest {
         readStore.getEventStore().put(unprocessedEvents);
 
         readStore.processEvents();
-        assertThat(readStore.getAggregate(wallet.getId()))
+        assertThat(readStore.getAggregate(wallet.getId(), Wallet.class))
                 .get()
                 .matches(w -> w.amount().intValue() == 20   , "amount should be 20");
-        assertThat(readStore.getAggregate(newWalletId))
+        assertThat(readStore.getAggregate(newWalletId.toString(), Wallet.class))
                 .get()
                 .matches(w -> w.ownerId().equals(newWalletOwnerId))
                 .matches(w -> w.amount().intValue() == 610);

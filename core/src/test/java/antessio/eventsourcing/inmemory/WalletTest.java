@@ -9,11 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import antessio.eventsourcing.EventSourcingService;
-import antessio.eventsourcing.inmemory.wallet.Wallet;
-import antessio.eventsourcing.inmemory.wallet.commands.CreateWalletCommand;
-import antessio.eventsourcing.inmemory.wallet.commands.TopUpWalletCommand;
-import antessio.eventsourcing.inmemory.wallet.projector.WalletProjections;
-import eventsourcing.aggregate.AggregateStore;
+import testutils.wallet.Wallet;
+import testutils.wallet.commands.CreateWalletCommand;
+import testutils.wallet.commands.TopUpWalletCommand;
+import testutils.wallet.projector.WalletProjections;
 
 class WalletTest {
 
@@ -21,7 +20,7 @@ class WalletTest {
     private InMemoryAggregateStore inMemoryAggregateStore;
     private InMemoryEventStore inMemoryEventStore;
 
-    private EventSourcingService<Wallet, UUID> eventStore;
+    private EventSourcingService<Wallet> eventStore;
 
     @BeforeEach
     void setUp() {
@@ -29,7 +28,7 @@ class WalletTest {
         inMemoryAggregateStore = new InMemoryAggregateStore();
         inMemoryEventStore = new InMemoryEventStore();
         eventStore = new EventSourcingService<>(inMemoryProjectorStore, inMemoryAggregateStore, inMemoryEventStore);
-        WalletProjections.registerProjections(eventStore);
+        WalletProjections.getProjectors().forEach(eventStore::registerProjector);
     }
 
     @Test
@@ -50,7 +49,7 @@ class WalletTest {
         Wallet wallet = new Wallet(UUID.randomUUID(), BigDecimal.TEN, UUID.randomUUID());
         eventStore.getAggregateStore().put(wallet);
 
-        Wallet updatedWallet = eventStore.publish(new TopUpWalletCommand(wallet.getId(), BigDecimal.valueOf(3000)));
+        Wallet updatedWallet = eventStore.publish(new TopUpWalletCommand(wallet.id(), BigDecimal.valueOf(3000)));
         assertThat(updatedWallet)
                 .isNotNull()
                 .matches(w -> w.amount().intValue() == 3010);
