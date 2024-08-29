@@ -37,6 +37,12 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:antessio/event-sourcing-service-example.git</connection>
+        <developerConnection>scm:git:git@github.com:antessio/event-sourcing-service-example.git</developerConnection>
+        <url>https://github.com/antessio/event-sourcing-service-example</url>
+    </scm>
     <build>
         <plugins>
             <plugin>
@@ -50,6 +56,9 @@
                 <version>3.0.0-M1</version>
                 <configuration>
                     <tagNameFormat>@{project.version}</tagNameFormat>
+
+                    <performRelease>false</performRelease>
+
                 </configuration>
             </plugin>
         </plugins>
