@@ -1,0 +1,12 @@
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/domain/CreateWalletCommand.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/domain/Wallet.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/domain/WalletCreatedEvent.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/domain/WalletId.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/domain/CommandDispatcher.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/Main.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/domain/WalletRepository.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/domain/WalletDomainService.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/application/WalletService.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/domain/WalletTopUpExecutedEvent.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/domain/OwnerId.java
+/Users/antoniodalessio/personal/event-sourcing-service-example/examples/wallet-service/src/main/java/antessio/wallet/domain/TopUpWalletCommand.java
